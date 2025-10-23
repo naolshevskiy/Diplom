@@ -1,0 +1,18 @@
+<settings>
+  <mirrors>
+    <mirror>
+      <id>google-maven-central</id>
+      <name>GCS Maven Central mirror Asia Pacific</name>
+      <url>https://maven-central-asia.storage-download.googleapis.com/maven2/</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
+
+  <servers>
+    <server>
+      <id>github</id>
+      <username>${GITHUB_REPO_CRED_USR}</username>
+      <password>${GITHUB_REPO_CRED_PSW}</password>
+    </server>
+  </servers>
+</settings>
