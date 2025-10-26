@@ -63,21 +63,19 @@ resource "yandex_kubernetes_cluster" "webbooks-k8s" {
       subnet_id = yandex_vpc_subnet.k8s-subnet.id
     }
     public_ip = true
+
+    # ✅ maintenance_policy и master_logging — ВНУТРИ master
+    maintenance_policy {
+      auto_upgrade = true
+    }
+
+    master_logging {
+      enabled = true
+    }
   }
 
   service_account_id      = yandex_iam_service_account.k8s-sa.id
   node_service_account_id = yandex_iam_service_account.k8s-node-sa.id
 
   release_channel = "RAPID"
-
-  dynamic "maintenance_policy" {
-    for_each = [{}]
-    content {
-      auto_upgrade = true
-    }
-  }
-
-  master_logging {
-    enabled = true
-  }
 }
