@@ -79,3 +79,51 @@ resource "yandex_kubernetes_cluster" "webbooks-k8s" {
 
   release_channel = "RAPID"
 }
+
+# Worker-ноды
+resource "yandex_kubernetes_node_group" "webbooks-nodes" {
+  cluster_id  = yandex_kubernetes_cluster.webbooks-k8s.id
+  name        = "webbooks-nodes"
+  description = "Node group for WebBooks app"
+
+  instance_template {
+    platform_id = "standard-v1"
+
+    resources {
+      memory = 2
+      cores  = 2
+    }
+
+    boot_disk {
+      type = "network-hdd"
+      size = 20
+    }
+
+    scheduling_policy {
+      preemptible = false
+    }
+
+    # Исправление: nat теперь внутри network_interface
+    network_interface {
+      subnet_ids = [yandex_vpc_subnet.k8s-subnet.id]  # ← явно указываем нашу подсеть
+      nat        = true  # даёт выход в интернет
+    }
+  }
+
+  scale_policy {
+    fixed_scale {
+      size = 1
+    }
+  }
+
+  allocation_policy {
+    location {
+      zone = "ru-central1-a"
+    }
+  }
+
+  maintenance_policy {
+    auto_repair  = true
+    auto_upgrade = true
+  }
+}
