@@ -15,16 +15,17 @@ provider "yandex" {
   zone      = "ru-central1-a"
 }
 
-# Сеть и подсеть
-resource "yandex_vpc_network" "k8s-net" {
-  name = "k8s-network"
+# Используем СУЩЕСТВУЮЩУЮ сеть (укажи её имя или ID)
+data "yandex_vpc_network" "existing" {
+  name = "default"  # ← замени, если имя другое (например, "network-abc123")
 }
 
+# Создаём подсеть внутри существующей сети
 resource "yandex_vpc_subnet" "k8s-subnet" {
   name           = "k8s-subnet"
   zone           = "ru-central1-a"
-  network_id     = yandex_vpc_network.k8s-net.id
-  v4_cidr_blocks = ["10.10.0.0/16"]
+  network_id     = data.yandex_vpc_network.existing.id
+  v4_cidr_blocks = ["10.10.1.0/24"]
 }
 
 # Сервисные аккаунты
@@ -36,7 +37,7 @@ resource "yandex_iam_service_account" "k8s-node-sa" {
   name = "k8s-node-service-account"
 }
 
-# Роли для аккаунтов
+# Роли
 resource "yandex_resourcemanager_folder_iam_member" "k8s_sa_editor" {
   folder_id = var.yc_folder_id
   role      = "editor"
@@ -52,19 +53,18 @@ resource "yandex_resourcemanager_folder_iam_member" "k8s_node_sa_puller" {
 # Kubernetes-кластер
 resource "yandex_kubernetes_cluster" "webbooks-k8s" {
   name        = "webbooks-k8s"
-  description = "K8s cluster for WebBooks DevOps project"
+  description = "K8s cluster for WebBooks"
 
-  network_id = yandex_vpc_network.k8s-net.id
+  network_id = data.yandex_vpc_network.existing.id
 
   master {
-    version = "1.28"
+    version = "1.30"
     zonal {
       zone      = "ru-central1-a"
       subnet_id = yandex_vpc_subnet.k8s-subnet.id
     }
     public_ip = true
 
-    # ✅ maintenance_policy и master_logging — ВНУТРИ master
     maintenance_policy {
       auto_upgrade = true
     }
