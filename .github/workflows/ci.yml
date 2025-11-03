@@ -22,7 +22,8 @@ jobs:
       - name: Build with Maven
         run: |
           cd webbooks
-          ./mvnw clean package -DskipTests
+          chmod +x ./mvnw
+          ./mvnw clean package -DskipTest
 
       - name: Run tests
         run: |
