@@ -73,7 +73,20 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm upgrade --install webbooks-db bitnami/postgresql \
             --set auth.postgresPassword=secretpassword \
+            --set auth.database=webbooks \
+            --set auth.username=postgres
+
+      - name: Deploy PostgreSQL
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm upgrade --install webbooks-db bitnami/postgresql \
+            --set auth.postgresPassword=secretpassword \
             --set auth.database=webbooks
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+         echo "Waiting for PostgreSQL pod..."
+         kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql --timeout=120s      
 
       - name: Deploy WebBooks
         run: |
