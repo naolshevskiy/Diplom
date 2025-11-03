@@ -5,9 +5,6 @@ stages:
 variables:
   IMAGE: "registry.gitlab.com/$CI_PROJECT_PATH/webbooks"
 
-before_script:
-  - echo "Using Kubernetes context: $(kubectl config current-context)"
-
 build-image:
   stage: build
   image: docker:20.10.16
@@ -31,38 +28,55 @@ deploy:
   image: alpine/k8s:1.30.0
   dependencies: []
   script:
-    - apk add --no-cache curl
-    # Установка yc CLI
+    - echo "Current Kubernetes context:"
+    - kubectl config current-context || true
+
+    - echo "Installing yc CLI..."
     - curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -n
     - export PATH="$PATH:/root/yandex-cloud/bin"
-    # Настройка yc
+
+    - echo "Configuring yc..."
     - yc config set token "$YC_TOKEN"
     - yc config set cloud-id "$YC_CLOUD_ID"
     - yc config set folder-id "$YC_FOLDER_ID"
-    # Получение kubeconfig
+
+    - echo "Getting K8s credentials..."
     - yc managed-kubernetes cluster get-credentials webbooks-k8s --external
-    # Установка Helm
+
+    - echo "Installing Helm..."
     - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-    # Деплой
+
+    - echo "Deploying PostgreSQL..."
     - helm repo add bitnami https://charts.bitnami.com/bitnami
     - helm upgrade --install webbooks-db bitnami/postgresql \
         --set auth.postgresPassword=secretpassword \
         --set auth.database=webbooks
+
+    - echo "Deploying WebBooks..."
     - helm upgrade --install webbooks ./infra/k8s/webbooks \
         --set image.repository=$IMAGE \
         --set image.tag=$CI_COMMIT_SHORT_SHA
-    # Получение IP
+
+    - echo "Waiting for LoadBalancer IP..."
     - |
+      IP=""
       for i in $(seq 1 30); do
-        IP=$(kubectl get svc webbooks -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+        IP=$(kubectl get svc webbooks -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
         if [ -n "$IP" ] && [ "$IP" != "<none>" ]; then
-          echo "IP: $IP"
+          echo "✅ Public IP: $IP"
+          echo "WEBBOOKS_IP=$IP" >> deploy.env
           break
         fi
         sleep 10
       done
-    # Уведомление
+      if [ -z "$IP" ]; then
+        echo "❌ Failed to get IP"
+        exit 1
+      fi
+
+    - echo "Sending Telegram notification..."
     - |
-      MSG="✅ WebBooks deployed!\\n🌐 http://$IP:8080\\n🔖 Commit: $CI_COMMIT_SHORT_SHA"
+      . deploy.env
+      MSG="✅ WebBooks deployed!\\n🌐 http://$WEBBOOKS_IP:8080\\n🔖 Commit: $CI_COMMIT_SHORT_SHA"
       curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
         -d "chat_id=$TELEGRAM_CHAT_ID&text=$MSG&parse_mode=Markdown"
