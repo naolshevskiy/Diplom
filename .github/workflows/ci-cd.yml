@@ -59,14 +59,14 @@ jobs:
       - name: Get K8s credentials
         run: yc managed-kubernetes cluster get-credentials webbooks-k8s --external
 
-      - name: Install kubectl and Helm
-        run: |
-          sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl
-          curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-          echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-          sudo apt-get update
-          sudo apt-get install -y kubectl
-          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+- name: Install kubectl
+  run: |
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+- name: Install Helm
+  run: |
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
       - name: Deploy PostgreSQL
         run: |
