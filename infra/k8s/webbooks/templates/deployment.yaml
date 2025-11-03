@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+meta
+  name: webbooks
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webbooks
+  template:
+    meta
+      labels:
+        app: webbooks
+    spec:
+      containers:
+      - name: webbooks
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_HOST
+          value: "{{ .Values.db.host }}"
+        - name: DB_PORT
+          value: "{{ .Values.db.port }}"
+        - name: DB_NAME
+          value: "{{ .Values.db.name }}"
+        - name: DB_USER
+          value: "{{ .Values.db.user }}"
+        - name: DB_PASSWORD
+          value: "{{ .Values.db.password }}"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 10

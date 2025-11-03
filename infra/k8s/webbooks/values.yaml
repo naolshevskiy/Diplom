@@ -1,0 +1,14 @@
+image:
+  repository: ghcr.io/naolshevskiy/webbooks
+  tag: latest
+
+db:
+  host: webbooks-db-postgresql
+  port: "5432"
+  name: webbooks
+  user: postgres
+  password: "secretpassword"
+
+service:
+  type: LoadBalancer
+  port: 8080
