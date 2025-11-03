@@ -1,6 +1,7 @@
+# infra/k8s/webbooks/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
-meta
+metadata:
   name: webbooks
 spec:
   replicas: 2
@@ -8,7 +9,7 @@ spec:
     matchLabels:
       app: webbooks
   template:
-    meta
+    metadata:
       labels:
         app: webbooks
     spec:
