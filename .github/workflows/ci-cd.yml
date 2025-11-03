@@ -23,8 +23,11 @@ jobs:
           distribution: 'temurin'
 
       - name: Build JAR
-        run: cd webbooks && ./mvnw clean package -DskipTests
-
+        run: | 
+          cd webbooks
+          chmod +x ./mvnw
+          ./mvnw clean package -DskipTests
+      
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
