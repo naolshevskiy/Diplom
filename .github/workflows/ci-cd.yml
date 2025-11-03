@@ -1,4 +1,4 @@
-# .github/workflows/ci-cd.yml
+#.github/workflows/ci-cd.yml
 name: WebBooks CI/CD
 
 on:
@@ -59,14 +59,14 @@ jobs:
       - name: Get K8s credentials
         run: yc managed-kubernetes cluster get-credentials webbooks-k8s --external
 
-- name: Install kubectl
-  run: |
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
-- name: Install Helm
-  run: |
-    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
       - name: Deploy PostgreSQL
         run: |
