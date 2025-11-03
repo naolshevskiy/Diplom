@@ -70,11 +70,12 @@ jobs:
 
       - name: Deploy PostgreSQL
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm upgrade --install webbooks-db bitnami/postgresql \
-            --set auth.postgresPassword=secretpassword \
-            --set auth.database=webbooks \
-            --set auth.username=postgres
+         helm repo add bitnami https://charts.bitnami.com/bitnami
+         helm upgrade --install webbooks-db bitnami/postgresql \
+           --set auth.postgresPassword=secretpassword \
+           --set auth.database=webbooks \
+           --set initdbScriptsConfigMap=webbooks-initdb
+
 
       - name: Deploy PostgreSQL
         run: |
