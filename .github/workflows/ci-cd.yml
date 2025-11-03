@@ -23,7 +23,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build JAR
-        run: cd apps/webbooks && ./mvnw clean package -DskipTests
+        run: cd webbooks && ./mvnw clean package -DskipTests
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -38,7 +38,7 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
-          context: apps/webbooks
+          context: webbooks
           push: true
           tags: ghcr.io/naolshevskiy/webbooks:${{ github.sha }}, ghcr.io/naolshevskiy/webbooks:latest
 

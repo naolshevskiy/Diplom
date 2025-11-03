@@ -21,10 +21,10 @@ jobs:
 
       - name: Build with Maven
         run: |
-          cd apps/webbooks
+          cd webbooks
           ./mvnw clean package -DskipTests
 
       - name: Run tests
         run: |
-          cd apps/webbooks
+          cd webbooks
           ./mvnw test
