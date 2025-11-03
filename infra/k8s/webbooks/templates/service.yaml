@@ -1,6 +1,7 @@
+# infra/k8s/webbooks/templates/service.yaml
 apiVersion: v1
 kind: Service
-meta:
+meta
   name: webbooks
 spec:
   type: {{ .Values.service.type }}
