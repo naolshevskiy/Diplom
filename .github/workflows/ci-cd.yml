@@ -70,13 +70,14 @@ jobs:
 
       - name: Deploy PostgreSQL
         run: |
-         helm repo add bitnami https://charts.bitnami.com/bitnami
          helm upgrade --install webbooks-db bitnami/postgresql \
            --set auth.postgresPassword=secretpassword \
            --set auth.database=webbooks \
            --set initdbScriptsConfigMap=webbooks-initdb \
-           --set image.tag=16.3.0-debian-12-r6
-
+           --set image.repository=bitnamilegacy/postgresql \
+           --set image.tag=16.3.0-debian-12-r6 \
+           --set volumePermissions.image.repository=bitnamilegacy/os-shell \
+           --set global.security.allowInsecureImages=true
 
       - name: Wait for PostgreSQL to be ready
         run: |
