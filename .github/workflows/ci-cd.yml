@@ -70,16 +70,13 @@ jobs:
 
       - name: Deploy PostgreSQL from Bitnami Legacy (OCI)
         run: |
-          helm upgrade --install webbooks-db oci://registry-1.docker.io/bitnamicharts/postgresql \
-            --version 16.3.0 \
-            --set auth.postgresPassword=secretpassword \
-            --set auth.database=webbooks \
-            --set initdbScriptsConfigMap=webbooks-initdb \
-            --set image.repository=bitnamilegacy/postgresql \
-            --set image.tag=16.3.0-debian-12-r6 \
-            --set volumePermissions.image.repository=bitnamilegacy/os-shell \
-            --set metrics.image.repository=bitnamilegacy/postgres-exporter \
-            --set global.security.allowInsecureImages=true
+         helm upgrade --install webbooks-db oci://registry-1.docker.io/bitnamicharts/postgresql \
+          --version 16.3.0 \
+          --set auth.postgresPassword=secretpassword \
+          --set auth.database=webbooks \
+          --set initdbScriptsConfigMap=webbooks-initdb \
+          --set image.repository=bitnami/postgresql \
+          --set global.security.allowInsecureImages=true
 
       - name: Wait for PostgreSQL to be ready
         run: |
