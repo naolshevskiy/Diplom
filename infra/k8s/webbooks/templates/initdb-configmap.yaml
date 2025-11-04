@@ -1,7 +1,7 @@
 # infra/k8s/webbooks/templates/initdb-configmap.yaml
 apiVersion: v1
 kind: ConfigMap
-meta:
+metadata:
   name: webbooks-initdb
 data:
   init.sql: |
