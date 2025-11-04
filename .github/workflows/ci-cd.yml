@@ -74,15 +74,9 @@ jobs:
          helm upgrade --install webbooks-db bitnami/postgresql \
            --set auth.postgresPassword=secretpassword \
            --set auth.database=webbooks \
-           --set initdbScriptsConfigMap=webbooks-initdb
+           --set initdbScriptsConfigMap=webbooks-initdb \
+           --set image.tag=16.3.0-debian-12-r6
 
-
-      - name: Deploy PostgreSQL
-        run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm upgrade --install webbooks-db bitnami/postgresql \
-            --set auth.postgresPassword=secretpassword \
-            --set auth.database=webbooks
 
       - name: Wait for PostgreSQL to be ready
         run: |
