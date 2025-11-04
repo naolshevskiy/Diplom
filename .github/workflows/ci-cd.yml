@@ -68,15 +68,13 @@ jobs:
         run: |
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-      - name: Deploy PostgreSQL from Bitnami Legacy (OCI)
+      - name: Deploy PostgreSQL
         run: |
-         helm upgrade --install webbooks-db oci://registry-1.docker.io/bitnamicharts/postgresql \
-          --version 16.3.0 \
-          --set auth.postgresPassword=secretpassword \
-          --set auth.database=webbooks \
-          --set initdbScriptsConfigMap=webbooks-initdb \
-          --set image.repository=bitnami/postgresql \
-          --set global.security.allowInsecureImages=true
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm upgrade --install webbooks-db bitnami/postgresql \
+            --set auth.postgresPassword=secretpassword \
+            --set auth.database=webbooks \
+            --set auth.username=postgres
 
       - name: Wait for PostgreSQL to be ready
         run: |
