@@ -98,7 +98,7 @@ jobs:
             IP=$(kubectl get svc webbooks -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
             if [ -n "$IP" ] && [ "$IP" != "<none>" ]; then
               echo "IP=$IP" >> $GITHUB_ENV
-              MSG="✅ WebBooks успешно развернуто!\\n🌐 http://$IP:8080\\n🔖 Коммит: ${{ github.sha }}"
+              MSG="✅ WebBooks успешно развернуто!\n🌐 http://$IP:8080 \n🔖"
               curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
                 -d "chat_id=${TELEGRAM_CHAT_ID}&text=${MSG}&parse_mode=Markdown"
               exit 0
